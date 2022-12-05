@@ -23,7 +23,7 @@ export default class Book extends THREE.Group {
     this._initBook();
     this._initPlate();
 
-    this.rotateX(Math.PI * 0.1);
+    this.rotateX(Math.PI * 0.05);
   };
 
   _initBook() {
@@ -31,7 +31,6 @@ export default class Book extends THREE.Group {
     this.add(book);
 
     // console.log(book);
-
     book.rotation.x = Math.PI * 0.5;
     book.rotation.y = Math.PI;
 

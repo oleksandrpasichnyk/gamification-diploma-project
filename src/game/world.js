@@ -1,10 +1,14 @@
 import { Black } from 'black-engine';
 import * as THREE from 'three';
+import { MathUtils } from "three";
 import GLOBAL_CONFIG from '../config';
 import CameraController from './camera-controller';
+import GATES_CONFIG from './data/gates-config';
 import Book from './objects/book';
+import Gates from './objects/gates';
 import Platform from './objects/platform';
 import PlayerController from './player-controller';
+import ScreenShake from './utils/screen-shake';
 import WORLD_CONFIG from './world-config';
 
 export default class World extends THREE.Group {
@@ -12,27 +16,82 @@ export default class World extends THREE.Group {
     super();
 
     this._camera = camera;
+    this._gatesPool = [];
+
+    this._screenShake = ScreenShake(this._camera);
+    this._isShaking = false;
+
     this._init();
   }
 
   update(dt) {
-    // this.platform.position.z += 0.1;
     if(!GLOBAL_CONFIG.orbitControls) {
-      this.cameraController.update();
+      this._cameraController.update();
     }
-
-    this.playerController.update(dt);
+    
+    if(this._isShaking) {
+      this._screenShake.update();
+    } else {
+      this._playerController.update(dt);
+    }
   }
 
   _init() { 
+    this._initPlatform();
+    this._initBook();
+    this._initGates();
+
+    this._cameraController = new CameraController(this._book, this._camera);
+    this._playerController = new PlayerController(this._book, this._gatesPool);
+    this._playerController.events.on('onCollideGates', (msg, isCorrect) => this._onCollideGates(isCorrect));
+  }
+
+  _initPlatform() {
     const platform = this.platform = new Platform();
     this.add(platform);
+  }
 
-    const book = this.book = new Book();
+  _initBook() {
+    const book = this._book = new Book();
     this.add(book);
 
     book.position.set(0, 0, 1);
-    this.cameraController = new CameraController(book, this._camera);
-    this.playerController = new PlayerController(book);
-   }
+  }
+
+  _initGates() {
+    const leftX = WORLD_CONFIG.platfotmWidth * 0.25;
+    const rightX = -WORLD_CONFIG.platfotmWidth * 0.25;
+
+    GATES_CONFIG.forEach(gatesData => {
+      const isCorrectLeft = Math.random() > 0.5;
+
+      const leftGates = new Gates(isCorrectLeft ? gatesData.correctAnswer : gatesData.uncorrectAnswer, isCorrectLeft);
+      const rightGates = new Gates(isCorrectLeft ? gatesData.uncorrectAnswer : gatesData.correctAnswer, !isCorrectLeft);
+      this.add(leftGates, rightGates);
+
+      leftGates.position.set(leftX,0, gatesData.positionZ);
+      rightGates.position.set(rightX, 0, gatesData.positionZ);
+
+      this._gatesPool.push([leftGates, rightGates]);
+    });
+  }
+
+  _onCollideGates(isCorrect) {
+    if(isCorrect) {
+
+    } else {
+      setTimeout(() => {
+        const offsetX = MathUtils.randFloat(0.13, 0.15) * (Math.random() > 0.5 ? 1 : -1);
+        const offsetY = MathUtils.randFloat(0.02, 0.03) * (Math.random() > 0.5 ? 1 : -1);
+        const duration = MathUtils.randInt(240, 250);
+  
+        this._screenShake.shake(new THREE.Vector3(offsetX, offsetY, 0), duration);
+  
+        this._isShaking = true;
+        setTimeout(() => {
+          this._isShaking = false;
+        }, duration);
+      }, 100);
+    }
+  }
 }

@@ -9,7 +9,7 @@ import World from './game/world'
 import * as dat from 'dat.gui'
 import GLOBAL_CONFIG from './config'
 import Loader from './loader'
-import { CanvasDriver, Engine, GameObject, Input, MasterAudio, StageScaleMode } from 'black-engine'
+import { Black, CanvasDriver, Engine, GameObject, Input, MasterAudio, StageScaleMode } from 'black-engine'
 const gui = new dat.GUI()
 
 /**
@@ -152,27 +152,62 @@ loader.events.on('onLoaded', () => {
   engine.stage.setSize(640, 960);
   engine.stage.scaleMode = StageScaleMode.LETTERBOX;
 
+  Black.engine.on('paused', () => onPause());
+  Black.engine.on('unpaused', () => onUnPause());
 
   world = new World(camera);
   scene.add(world);
 });
 
 const clock = new THREE.Clock();
+clock.start();
 
-const update = (time) => {
+let isPause = false;
+
+const update = () => {
   const dt = clock.getDelta();
 
-  if(world) {
-    world.update(dt);
+  if (isPause === false) {
+    if(world) {
+      world.update(dt);
+    }
+
+    renderer.render(scene, camera);
+
+    if(GLOBAL_CONFIG.orbitControls) {
+      orbitControls.update();
+    }
   }
+  
+  window.requestAnimationFrame(update);
+}
+window.requestAnimationFrame(update);
 
-  renderer.render(scene, camera);
-
-  if(GLOBAL_CONFIG.orbitControls) {
-    orbitControls.update();
-  }
-
-  window.requestAnimationFrame(time => update(time));
+const onPause = () => {
+  clock.stop();
+  isPause = true;
 }
 
-update()
+const onUnPause = () => {
+  clock.start();
+  isPause = false;
+}
+
+
+showFPSMeter();
+
+function showFPSMeter() {
+  (function () {
+    var script = document.createElement('script');
+    script.onload = function () {
+      var stats = new Stats();
+      document.body.appendChild(stats.dom);
+      requestAnimationFrame(function loop() {
+        stats.update();
+        requestAnimationFrame(loop);
+      });
+    };
+    script.src = '//mrdoob.github.io/stats.js/build/stats.min.js';
+    document.head.appendChild(script);
+  })();
+};

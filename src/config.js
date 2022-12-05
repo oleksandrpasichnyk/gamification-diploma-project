@@ -3,7 +3,6 @@ import * as THREE from 'three';
 const GLOBAL_CONFIG = {
   orbitControls: false,
 
-
   cameraPosition: new THREE.Vector3(0, 2, -4),
   ambientLightEnabled: true,
   ambientLightColor: 0xffffff,

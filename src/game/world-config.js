@@ -3,7 +3,7 @@ const WORLD_CONFIG = {
   platfotmLength: 300,
   platfotmWeight: 0.2,
 
-  playerSpeed: 8,
+  playerSpeed: 5,
 }
 
 export default WORLD_CONFIG;
