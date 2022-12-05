@@ -35,11 +35,16 @@ export default class Loader {
   }
 
   loadModels() {
-    this.modelsLoader.load('./assets/models/book.glb', asset => Loader.Assets['book'] = asset);
+    this.modelsLoader.load('./assets/models/book.glb', model => this.onAssetLoaded(model, 'book'));
   }
 
   loadTextures() {
-    this.textureLoader.load('./assets/textures/book_cover.jpg', texture => Loader.Assets['book_cover'] = texture);
+    this.textureLoader.load('./assets/textures/book_cover.jpg', texture => this.onAssetLoaded(texture, 'book_cover'));
+    this.textureLoader.load('./assets/textures/road_bw.png', texture => this.onAssetLoaded(texture, 'road_bw'));
+  }
+
+  onAssetLoaded(asset, name) {
+    Loader.Assets[name] = asset;
   }
 }
 

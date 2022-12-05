@@ -157,12 +157,13 @@ loader.events.on('onLoaded', () => {
   scene.add(world);
 });
 
-const clock = new THREE.Clock()
-const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
+const clock = new THREE.Clock();
+
+const update = (time) => {
+  const dt = clock.getDelta();
 
   if(world) {
-    world.update(elapsedTime);
+    world.update(dt);
   }
 
   renderer.render(scene, camera);
@@ -171,7 +172,7 @@ const tick = () => {
     orbitControls.update();
   }
 
-  window.requestAnimationFrame(tick);
+  window.requestAnimationFrame(time => update(time));
 }
 
-tick()
+update()

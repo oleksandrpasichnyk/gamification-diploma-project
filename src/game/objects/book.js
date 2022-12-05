@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import Loader from '../../loader';
 import Utils from '../utils/utils';
+import WORLD_CONFIG from '../world-config';
 
 export default class Book extends THREE.Group {
   constructor() { 
@@ -13,9 +14,16 @@ export default class Book extends THREE.Group {
     return Utils.getBoundingBox(this.book).x;
   }
 
+  update(dt) {
+    const rotationZ = -(this.position.x/WORLD_CONFIG.platfotmWidth * 0.5) * Math.PI * 0.3;
+    this.rotation.z = rotationZ;
+  }
+
   _init() {
     this._initBook();
     this._initPlate();
+
+    this.rotateX(Math.PI * 0.1);
   };
 
   _initBook() {
@@ -28,7 +36,7 @@ export default class Book extends THREE.Group {
     book.rotation.y = Math.PI;
 
     const boundingBox = Utils.getBoundingBox(book);
-    book.position.y = boundingBox.y * 0.6;
+    book.position.y = boundingBox.y * 0.7;
     book.position.x = boundingBox.x * 0.55;
 
     Utils.setObjectMaterial(book, new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide }));
