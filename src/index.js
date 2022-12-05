@@ -1,10 +1,14 @@
 import './style/main.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import World from './game/world'
+
 /**
  * GUI Controls
  */
 import * as dat from 'dat.gui'
+import GLOBAL_CONFIG from './config'
+import Loader from './loader'
 const gui = new dat.GUI()
 
 /**
@@ -15,17 +19,7 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-
-/**
- * Object
- */
-const geometry = new THREE.IcosahedronGeometry(20, 1)
-const material = new THREE.MeshNormalMaterial()
-// Material Props.
-material.wireframe = true
-// Create Mesh & Add To Scene
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
+scene.background = new THREE.Color(0x80dfff);
 
 /**
  * Sizes
@@ -65,21 +59,19 @@ camera.position.z = 50
 scene.add(camera)
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
-controls.autoRotate = true
+const orbitControls = new OrbitControls(camera, canvas)
+orbitControls.enableDamping = true
 // controls.enableZoom = false
-controls.enablePan = false
-controls.dampingFactor = 0.05
-controls.maxDistance = 1000
-controls.minDistance = 30
-controls.touches = {
+orbitControls.enablePan = false
+orbitControls.dampingFactor = 0.05
+orbitControls.maxDistance = 30
+orbitControls.minDistance = 1
+orbitControls.touches = {
   ONE: THREE.TOUCH.ROTATE,
   TWO: THREE.TOUCH.DOLLY_PAN,
 }
-/**
- * Renderer
- */
+
+
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   antialias: true,
@@ -87,24 +79,83 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-/**
- * Animate
- */
+
+const {
+  ambientLightEnabled,
+  ambientLightColor,
+  ambientLightIntensity,
+
+  directionalLightEnabled,
+  directionalLightColor,
+  directionalLightIntensity,
+  directionalLightPosition,
+  directionalLightLookAt
+} = GLOBAL_CONFIG;
+
+if (directionalLightEnabled) {
+  const directionalLight = new THREE.DirectionalLight(directionalLightColor, 0.1);
+  directionalLight.lookAt(directionalLightLookAt.x, directionalLightLookAt.y, directionalLightLookAt.z);
+  directionalLight.position.set(directionalLightPosition.x, directionalLightPosition.y, directionalLightPosition.z);
+  scene.add(directionalLight);
+  directionalLight.castShadow = true;
+  // directionalLight.shadow.bias = -0.01
+  directionalLight.shadow.mapSize.width = 1300;
+  directionalLight.shadow.mapSize.height = 1300;
+
+  const shadowCamera = directionalLight.shadow.camera;
+  shadowCamera.left = -7 * 0.4;
+  shadowCamera.right = 7 * 0.4;
+  shadowCamera.bottom = -7 * 0.5;
+  shadowCamera.top = 7 * 0.5;
+  shadowCamera.far = 40;
+}
+
+const directionalLight = new THREE.DirectionalLight(directionalLightColor, 0.75);
+directionalLight.lookAt(directionalLightLookAt.x, directionalLightLookAt.y, directionalLightLookAt.z);
+directionalLight.position.set(directionalLightPosition.x, directionalLightPosition.y, directionalLightPosition.z);
+scene.add(directionalLight);
+directionalLight.castShadow = false;
+// directionalLight.shadow.bias = -0.01
+directionalLight.shadow.mapSize.width = 1300;
+directionalLight.shadow.mapSize.height = 1300;
+
+const shadowCamera = directionalLight.shadow.camera;
+shadowCamera.left = -7 * 0.4;
+shadowCamera.right = 7 * 0.4;
+shadowCamera.bottom = -7 * 0.5;
+shadowCamera.top = 7 * 0.5;
+shadowCamera.far = 40;
+
+
+if (ambientLightEnabled) {
+  const ambientlight = new THREE.AmbientLight(ambientLightColor, ambientLightIntensity);
+  scene.add(ambientlight);
+}
+
+
+const loader = new Loader();
+let world;
+
+loader.events.on('onLoaded', () => {
+  world = new World();
+  scene.add(world);
+});
+
 const clock = new THREE.Clock()
 const tick = () => {
-  const elapsedTime = clock.getElapsedTime()
+  const elapsedTime = clock.getElapsedTime();
 
-  //mesh.rotation.y += 0.01 * Math.sin(1)
-  //mesh.rotation.y += 0.01 * Math.sin(1)
-  mesh.rotation.z += 0.01 * Math.sin(1)
+  if(world) {
+    world.update(elapsedTime);
+  }
+  
+  renderer.render(scene, camera);
 
-  // Update controls
-  controls.update()
-  // Render
-  renderer.render(scene, camera)
+  if(GLOBAL_CONFIG.orbitControls) {
+    orbitControls.update();
+  }
 
-  // Call tick again on the next frame
-  window.requestAnimationFrame(tick)
+  window.requestAnimationFrame(tick);
 }
 
 tick()

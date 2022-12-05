@@ -71,7 +71,14 @@ module.exports = {
                     'raw-loader',
                     'glslify-loader'
                 ]
-            }
+            },
+            {
+                test: /\.(glb|gltf)$/,
+                use: {
+                  loader: "file-loader"
+                },
+              }
         ]
     }
 }
+
