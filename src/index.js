@@ -9,6 +9,7 @@ import World from './game/world'
 import * as dat from 'dat.gui'
 import GLOBAL_CONFIG from './config'
 import Loader from './loader'
+import { CanvasDriver, Engine, GameObject, Input, MasterAudio, StageScaleMode } from 'black-engine'
 const gui = new dat.GUI()
 
 /**
@@ -59,16 +60,21 @@ camera.position.z = 50
 scene.add(camera)
 
 // Controls
-const orbitControls = new OrbitControls(camera, canvas)
-orbitControls.enableDamping = true
-// controls.enableZoom = false
-orbitControls.enablePan = false
-orbitControls.dampingFactor = 0.05
-orbitControls.maxDistance = 30
-orbitControls.minDistance = 1
-orbitControls.touches = {
-  ONE: THREE.TOUCH.ROTATE,
-  TWO: THREE.TOUCH.DOLLY_PAN,
+
+let orbitControls;
+
+if(GLOBAL_CONFIG.orbitControls) { 
+  orbitControls = new OrbitControls(camera, canvas)
+  orbitControls.enableDamping = true
+  // controls.enableZoom = false
+  orbitControls.enablePan = false
+  orbitControls.dampingFactor = 0.05
+  orbitControls.maxDistance = 30
+  orbitControls.minDistance = 1
+  orbitControls.touches = {
+    ONE: THREE.TOUCH.ROTATE,
+    TWO: THREE.TOUCH.DOLLY_PAN,
+  }
 }
 
 
@@ -137,7 +143,17 @@ const loader = new Loader();
 let world;
 
 loader.events.on('onLoaded', () => {
-  world = new World();
+  const engine = new Engine('webgl', GameObject, CanvasDriver, [Input, MasterAudio]);
+  engine.pauseOnBlur = true;
+  engine.pauseOnHide = true;
+  engine.viewport.isTransperent = false;
+  engine.start();
+
+  engine.stage.setSize(640, 960);
+  engine.stage.scaleMode = StageScaleMode.LETTERBOX;
+
+
+  world = new World(camera);
   scene.add(world);
 });
 
@@ -148,7 +164,7 @@ const tick = () => {
   if(world) {
     world.update(elapsedTime);
   }
-  
+
   renderer.render(scene, camera);
 
   if(GLOBAL_CONFIG.orbitControls) {

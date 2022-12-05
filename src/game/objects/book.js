@@ -9,8 +9,8 @@ export default class Book extends THREE.Group {
     this._init();
   }
 
-  update(dt) {
-
+  getWidth() {
+    return Utils.getBoundingBox(this.book).x;
   }
 
   _init() {
@@ -25,10 +25,11 @@ export default class Book extends THREE.Group {
     // console.log(book);
 
     book.rotation.x = Math.PI * 0.5;
+    book.rotation.y = Math.PI;
 
     const boundingBox = Utils.getBoundingBox(book);
-    book.position.y = boundingBox.y * 0.5;
-    book.position.x = -boundingBox.x * 0.55;
+    book.position.y = boundingBox.y * 0.6;
+    book.position.x = boundingBox.x * 0.55;
 
     Utils.setObjectMaterial(book, new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide }));
   }
@@ -44,6 +45,8 @@ export default class Book extends THREE.Group {
 
     this.add(plane);
     plane.position.y = this.book.position.y;
-    plane.position.z = 0.005;
+    plane.position.z = -boundingBox.z - 0.005;
+
+    plane.rotation.y = Math.PI;
   }
 }
