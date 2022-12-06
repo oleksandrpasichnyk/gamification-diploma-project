@@ -12,7 +12,7 @@ export default class Gates extends THREE.Group {
     this._isCorrect = isCorrect;
 
     this._width = WORLD_CONFIG.platfotmWidth * 0.5;
-    this._height = 0.85;
+    this._height = 0.95;
 
     this._isEnabled = true;
 

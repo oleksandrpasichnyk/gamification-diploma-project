@@ -87,16 +87,19 @@ export default class World extends THREE.Group {
   _initGates() {
     const leftX = WORLD_CONFIG.platfotmWidth * 0.25;
     const rightX = -WORLD_CONFIG.platfotmWidth * 0.25;
+    const startPositionZ = 15;
+    const distanceBetweenGates = 13;
 
-    GATES_CONFIG.forEach(gatesData => {
+    GATES_CONFIG.forEach((gatesData, i) => {
       const isCorrectLeft = Math.random() > 0.5;
 
       const leftGates = new Gates(isCorrectLeft ? gatesData.correctAnswer : gatesData.uncorrectAnswer, isCorrectLeft);
       const rightGates = new Gates(isCorrectLeft ? gatesData.uncorrectAnswer : gatesData.correctAnswer, !isCorrectLeft);
       this.add(leftGates, rightGates);
 
-      leftGates.position.set(leftX,0, gatesData.positionZ);
-      rightGates.position.set(rightX, 0, gatesData.positionZ);
+      const positionZ = i * distanceBetweenGates + startPositionZ; //gatesData.positionZ;
+      leftGates.position.set(leftX,0, positionZ);
+      rightGates.position.set(rightX, 0, positionZ);
 
       this._gatesPool.push([leftGates, rightGates]);
     });
