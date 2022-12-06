@@ -5,7 +5,7 @@ import Loader from './loader'
 import { CanvasDriver, Engine, GameObject, Input, MasterAudio, StageScaleMode } from 'black-engine'
 import Game from './game'
 
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 
 const engine = new Engine('container', GameObject, CanvasDriver, [Input, MasterAudio]);
 engine.pauseOnBlur = true;

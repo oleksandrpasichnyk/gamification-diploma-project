@@ -1,3 +1,4 @@
+import { Black, MessageDispatcher } from 'black-engine';
 import * as THREE from 'three';
 import { MathUtils } from "three";
 import GLOBAL_CONFIG from '../config';
@@ -13,17 +14,27 @@ import WORLD_CONFIG from './world-config';
 export default class World extends THREE.Group {
   constructor(camera) { 
     super();
+    this.events = new MessageDispatcher();
 
     this._camera = camera;
     this._gatesPool = [];
 
     this._screenShake = ScreenShake(this._camera);
     this._isShaking = false;
+    this._isPause = true;
 
     this._init();
   }
 
+  start() {
+    this._isPause = false;
+  }
+
   update(dt) {
+    if(this._isPause) {
+      return
+    }
+
     if(!GLOBAL_CONFIG.orbitControls) {
       this._cameraController.update();
     }
@@ -40,7 +51,13 @@ export default class World extends THREE.Group {
     this._initBook();
     this._initGates();
 
+    Black.input.once('pointerDown', () => {
+      this.start();
+    });
+
     this._cameraController = new CameraController(this._book, this._camera);
+    this._cameraController.setStartPosition();
+
     this._playerController = new PlayerController(this._book, this._gatesPool);
     this._playerController.events.on('onCollideGates', (msg, isCorrect) => this._onCollideGates(isCorrect));
   }
@@ -77,7 +94,7 @@ export default class World extends THREE.Group {
 
   _onCollideGates(isCorrect) {
     if(isCorrect) {
-
+      this.events.post('onCorrectCollide');
     } else {
       setTimeout(() => {
         const offsetX = MathUtils.randFloat(0.13, 0.15) * (Math.random() > 0.5 ? 1 : -1);

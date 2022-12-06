@@ -1,4 +1,4 @@
-import { Black, DisplayObject, Graphics, TextField } from "black-engine";
+import { Black, DisplayObject } from "black-engine";
 import Counter from "./counter";
 
 export default class UI extends DisplayObject {
@@ -6,6 +6,10 @@ export default class UI extends DisplayObject {
     super();
 
     this._init();
+  }
+
+  increaseCounter() {
+    this._counter.increaseValue();
   }
 
   onResize() {

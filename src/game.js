@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GLOBAL_CONFIG from "./config";
 import World from "./game/world";
 import UI from "./ui/ui";
+import GameController from './game-controller';
 
 export default class Game {
   constructor() {
@@ -171,6 +172,8 @@ export default class Game {
 
     const ui = this._ui = new UI();
     Black.stage.add(ui);
+
+    this._gameController = new GameController(world, ui);
   }
 
   update() {
