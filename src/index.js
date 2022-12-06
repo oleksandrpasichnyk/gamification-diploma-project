@@ -10,6 +10,7 @@ import * as dat from 'dat.gui'
 import GLOBAL_CONFIG from './config'
 import Loader from './loader'
 import { Black, CanvasDriver, Engine, GameObject, Input, MasterAudio, StageScaleMode } from 'black-engine'
+import UI from './ui/ui'
 const gui = new dat.GUI()
 
 /**
@@ -84,6 +85,16 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.LinearToneMapping;
+renderer.toneMappingExposure = 0.95;
+
+renderer.domElement.style.position = 'absolute';
+renderer.domElement.style.top = 0;
+renderer.domElement.style.touchAction = 'none';
+renderer.domElement.style.userSelect = 'none';
+renderer.domElement.style.overflow = 'hidden';
 
 
 const {
@@ -142,21 +153,26 @@ if (ambientLightEnabled) {
 const loader = new Loader();
 let world;
 
+const engine = new Engine('container', GameObject, CanvasDriver, [Input, MasterAudio]);
+engine.pauseOnBlur = true;
+engine.pauseOnHide = true;
+engine.viewport.isTransperent = false;
+engine.start();
+
+engine.stage.setSize(640, 960);
+engine.stage.scaleMode = StageScaleMode.LETTERBOX;
+
+Black.engine.on('paused', () => onPause());
+Black.engine.on('unpaused', () => onUnPause());
+
+Black.engine.containerElement.prepend(renderer.domElement);
+
 loader.events.on('onLoaded', () => {
-  const engine = new Engine('webgl', GameObject, CanvasDriver, [Input, MasterAudio]);
-  engine.pauseOnBlur = true;
-  engine.pauseOnHide = true;
-  engine.viewport.isTransperent = false;
-  engine.start();
-
-  engine.stage.setSize(640, 960);
-  engine.stage.scaleMode = StageScaleMode.LETTERBOX;
-
-  Black.engine.on('paused', () => onPause());
-  Black.engine.on('unpaused', () => onUnPause());
-
   world = new World(camera);
   scene.add(world);
+
+  const ui = new UI();
+  Black.stage.add(ui);
 });
 
 const clock = new THREE.Clock();
