@@ -10,8 +10,8 @@ export default class PlayerController {
     this._player = player;
     this._gatesPool = gatesPool;
 
-    this._prewX = Black.stage.bounds.center().x;
-    this._basicInputWidth = 100;
+    this._prewX = window.innerWidth * 0.5;
+    this._basicInputWidth = Math.max(100, window.innerWidth * 0.1);
     this._maxOffsetX = WORLD_CONFIG.platfotmWidth * 0.5;
     this._playerWidth = this._player.getWidth();
 
@@ -26,7 +26,7 @@ export default class PlayerController {
   }
 
   update(dt) {
-    // dt = 0.016
+    dt = 0.016
     if(this._isFinished) {
       return;
     }
@@ -34,7 +34,7 @@ export default class PlayerController {
     const player = this._player;
     player.position.z += WORLD_CONFIG.playerSpeed * dt;
 
-    const inputOffsetX = (Black.stage.bounds.center().x - this._prewX)/this._basicInputWidth;
+    const inputOffsetX = (window.innerWidth * 0.5 - this._prewX)/this._basicInputWidth;
     const offsetX = (Math.min(Math.abs(inputOffsetX), this._maxOffsetX) - this._playerWidth * 0.5) * (inputOffsetX > 0 ? 1 : -1);
 
     player.position.x = lerp(player.position.x, offsetX, 0.3);

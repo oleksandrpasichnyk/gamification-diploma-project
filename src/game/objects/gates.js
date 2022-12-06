@@ -86,7 +86,7 @@ export default class Gates extends THREE.Group {
     text.multiline = true;
     text.size = 60;
     text.strokeColor = 0x000000;
-    text.strokeThickness = 5;
+    text.strokeThickness = 7;
     text.align = 'center';
     text.alignPivotOffset();
     text.x = renderTexture.width * 0.5;
@@ -96,6 +96,6 @@ export default class Gates extends THREE.Group {
 
     textMesh.position.y = this._height * 0.55;
     textMesh.position.z = -0.01;
-    textMesh.scale.set(2, 2, 2);
+    textMesh.scale.set(1.5, 1.5, 1.5);
   }
 }
