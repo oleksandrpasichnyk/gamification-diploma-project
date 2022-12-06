@@ -1,4 +1,3 @@
-import { Black } from 'black-engine';
 import * as THREE from 'three';
 import { MathUtils } from "three";
 import GLOBAL_CONFIG from '../config';
