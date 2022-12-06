@@ -16,7 +16,7 @@ export default class Platform extends THREE.Group {
 
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.offset.set(0, 0);
-    texture.repeat.set(1, 118);
+    texture.repeat.set(1, WORLD_CONFIG.platfotmLength/WORLD_CONFIG.platfotmWidth);
 
     const material = new THREE.MeshStandardMaterial({ color: 0xf0eeff, map: texture });
 

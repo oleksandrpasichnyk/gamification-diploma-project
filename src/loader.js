@@ -41,6 +41,10 @@ export default class Loader {
   loadTextures() {
     this.textureLoader.load('./assets/textures/book_cover.jpg', texture => this.onAssetLoaded(texture, 'book_cover'));
     this.textureLoader.load('./assets/textures/road_bw.png', texture => this.onAssetLoaded(texture, 'road_bw'));
+    this.textureLoader.load('./assets/textures/road.png', texture => this.onAssetLoaded(texture, 'road'));
+    this.textureLoader.load('./assets/textures/path.png', texture => this.onAssetLoaded(texture, 'path'));
+    this.textureLoader.load('./assets/textures/path2.jpg', texture => this.onAssetLoaded(texture, 'path2'));
+    this.textureLoader.load('./assets/textures/sunflowers.jpg', texture => this.onAssetLoaded(texture, 'sunflowers'));
   }
 
   onAssetLoaded(asset, name) {

@@ -4,6 +4,7 @@ import { MathUtils } from "three";
 import GLOBAL_CONFIG from '../config';
 import CameraController from './camera-controller';
 import GATES_CONFIG from './data/gates-config';
+import Environment from './environment';
 import Book from './objects/book';
 import Gates from './objects/gates';
 import Platform from './objects/platform';
@@ -43,6 +44,7 @@ export default class World extends THREE.Group {
       this._screenShake.update();
     } else {
       this._playerController.update(dt);
+      this._sky.position.copy(this._book.position);
     }
   }
 
@@ -50,6 +52,7 @@ export default class World extends THREE.Group {
     this._initPlatform();
     this._initBook();
     this._initGates();
+    this._initEnvironment();
 
     Black.input.once('pointerDown', () => {
       this.start();
@@ -62,6 +65,13 @@ export default class World extends THREE.Group {
     this._playerController.events.on('onCollideGates', (msg, isCorrect) => this._onCollideGates(isCorrect));
   }
 
+  _initEnvironment() {
+    const environment = this._environment = new Environment();
+    this.add(environment);
+
+    this._sky = environment.getSky();
+  }
+
   _initPlatform() {
     const platform = this.platform = new Platform();
     this.add(platform);
@@ -71,7 +81,7 @@ export default class World extends THREE.Group {
     const book = this._book = new Book();
     this.add(book);
 
-    book.position.set(0, 0, 1);
+    book.position.set(0, 0, 5);
   }
 
   _initGates() {
