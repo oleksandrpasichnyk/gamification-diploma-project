@@ -13,11 +13,12 @@ import ScreenShake from './utils/screen-shake';
 import WORLD_CONFIG from './world-config';
 
 export default class World extends THREE.Group {
-  constructor(camera) { 
+  constructor(camera, scene) { 
     super();
     this.events = new MessageDispatcher();
 
     this._camera = camera;
+    this._scene = scene;
     this._gatesPool = [];
 
     this._screenShake = ScreenShake(this._camera);
@@ -54,19 +55,16 @@ export default class World extends THREE.Group {
     this._initGates();
     this._initEnvironment();
 
-    Black.input.once('pointerDown', () => {
-      this.start();
-    });
-
     this._cameraController = new CameraController(this._book, this._camera);
     this._cameraController.setStartPosition();
 
     this._playerController = new PlayerController(this._book, this._gatesPool);
-    this._playerController.events.on('onCollideGates', (msg, isCorrect) => this._onCollideGates(isCorrect));
+    this._playerController.events.on('onCollideGates', (msg, isCorrect, text) => this._onCollideGates(isCorrect, text));
+    this._playerController.events.on('onFinished', () => this._finish());
   }
 
   _initEnvironment() {
-    const environment = this._environment = new Environment();
+    const environment = this._environment = new Environment(this._scene);
     this.add(environment);
 
     this._sky = environment.getSky();
@@ -105,10 +103,10 @@ export default class World extends THREE.Group {
     });
   }
 
-  _onCollideGates(isCorrect) {
-    if(isCorrect) {
-      this.events.post('onCorrectCollide');
-    } else {
+  _onCollideGates(isCorrect, text) {
+    this.events.post('onCollide', isCorrect, text);
+    
+    if(!isCorrect) {
       setTimeout(() => {
         const offsetX = MathUtils.randFloat(0.13, 0.15) * (Math.random() > 0.5 ? 1 : -1);
         const offsetY = MathUtils.randFloat(0.02, 0.03) * (Math.random() > 0.5 ? 1 : -1);
@@ -122,5 +120,9 @@ export default class World extends THREE.Group {
         }, duration);
       }, 100);
     }
+  }
+
+  _finish() {
+    this.events.post('onFinished');
   }
 }

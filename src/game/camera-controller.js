@@ -10,13 +10,17 @@ export default class CameraController {
   setStartPosition() {
     const cameraPosition = this._getCameraPosition();
     this._camera.position.copy(cameraPosition);
-    this._camera.lookAt(this._player.position);
+    const lookAt = this._player.position.clone();
+    lookAt.y += 1;
+    this._camera.lookAt(lookAt);
   }
 
   update() {
     const cameraPosition = this._getCameraPosition();
     this._camera.position.copy(lerpVec(this._camera.position, cameraPosition, 0.8));
-    this._camera.lookAt(this._player.position);
+    const lookAt = this._player.position.clone();
+    lookAt.y += 1;
+    this._camera.lookAt(lookAt);
   }
 
   _getCameraPosition() {

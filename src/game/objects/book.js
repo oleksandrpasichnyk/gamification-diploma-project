@@ -30,7 +30,6 @@ export default class Book extends THREE.Group {
     const book = this.book = Utils.createObject('book');
     this.add(book);
 
-    // console.log(book);
     book.rotation.x = Math.PI * 0.5;
     book.rotation.y = Math.PI;
 

@@ -16,7 +16,7 @@ const GATES_CONFIG = [
   {
     taskText: 'taskText',
     correctAnswer: 'спИ́на',
-    uncorrectAnswer: 'спинаА́',
+    uncorrectAnswer: 'спинА́',
     positionZ: 30
   },
   {

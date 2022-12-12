@@ -19,6 +19,10 @@ export default class Gates extends THREE.Group {
     this._init();
   }
 
+  getText() {
+    return this._textString;
+  }
+
   onCollide() {
     if(!this._isEnabled) {
       return;
@@ -47,7 +51,7 @@ export default class Gates extends THREE.Group {
   _initPlane() {
     const geometry = new THREE.PlaneBufferGeometry(this._width, this._height);
     geometry.translate(0, this._height * 0.5 + WORLD_CONFIG.platfotmWeight * 0.5, 0);
-    const material = this._material = new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.5, color: 0x5078e6, side: THREE.DoubleSide });
+    const material = this._material = new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.5, color: 0xcccccc, side: THREE.DoubleSide });
     const mesh = this._plane = new THREE.Mesh(geometry, material);
 
     this.add(mesh);
@@ -57,7 +61,7 @@ export default class Gates extends THREE.Group {
     const r = 0.03;
     const geometry = new THREE.CylinderBufferGeometry(r, r, this._height, 10);
     geometry.translate(0, this._height * 0.5 + WORLD_CONFIG.platfotmWeight * 0.5, 0);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const material = new THREE.MeshStandardMaterial({ color: 0xccccff, metalness: 0.5, emissive: 0.9 });
 
     const leftPillar = new THREE.Mesh(geometry, material);
     const rightPillar = new THREE.Mesh(geometry, material);
@@ -80,7 +84,7 @@ export default class Gates extends THREE.Group {
 
     renderTexture.renderTarget.clear();
 
-    const text = new TextField(this._textString);
+    const text = new TextField(this._textString, 'Arial');
     text.autoSize = true;
     text.textColor = 0xffffff;
     text.multiline = true;

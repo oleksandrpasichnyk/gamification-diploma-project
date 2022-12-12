@@ -21,8 +21,13 @@ export default class PlayerController {
   }
 
   finish() {
+    if(this._isFinished) {
+      return;
+    }
+
     this._isFinished = true;
     console.log('finish')
+    this.events.post('onFinished');
   }
 
   update(dt) {
@@ -50,7 +55,7 @@ export default class PlayerController {
         const gate = player.position.x > 0 ? pair[0] : pair[1];
         const isCorrect = gate.onCollide();
 
-        this._showEffect(isCorrect);
+        this._onCollideGates(isCorrect, gate.getText());
 
         pair[0].disable();
         pair[1].disable();
@@ -66,14 +71,8 @@ export default class PlayerController {
     });
   }
 
-  _showEffect(isCorrect) {
-    this.events.post('onCollideGates', isCorrect);
-
-    if(isCorrect) {
-
-    } else {
-
-    }
+  _onCollideGates(isCorrect, text) {
+    this.events.post('onCollideGates', isCorrect, text);
   }
 
   _listenSignals() {

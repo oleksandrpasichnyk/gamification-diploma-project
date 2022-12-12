@@ -35,7 +35,8 @@ export default class Game {
     Black.engine.on('paused', () => this._onPause());
     Black.engine.on('unpaused', () => this._onUnPause());
 
-    window.addEventListener('resize', () => this.onResize());
+    window.addEventListener('resize', () => this.onResize(), false);
+    this.onResize();
 
     setTimeout(() => {
       window.requestAnimationFrame(() => this.update());
@@ -52,7 +53,7 @@ export default class Game {
       75,
       window.innerWidth / window.innerHeight,
       0.001,
-      5000
+      1000
     )
 
     camera.position.x = 1
@@ -158,16 +159,17 @@ export default class Game {
     const { _camera: camera, _renderer: renderer } = this;
 
     // Update camera
-    camera.aspect = width / height
-    camera.updateProjectionMatrix()
+    camera.fov = width > height ? 50 : 70;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
   
     // Update renderer
-    renderer.setSize(width, height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 
   _initWorld() {
-    const world = this._world = new World(this._camera);
+    const world = this._world = new World(this._camera, this._scene);
     this._scene.add(world);
 
     const ui = this._ui = new UI();

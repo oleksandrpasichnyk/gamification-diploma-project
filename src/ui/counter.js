@@ -1,3 +1,5 @@
+import { Tween } from "black-engine";
+import { Ease } from "black-engine";
 import { DisplayObject, TextField } from "black-engine";
 
 export default class Counter extends DisplayObject {
@@ -5,7 +7,41 @@ export default class Counter extends DisplayObject {
     super();
 
     this._value = 0;
+    this.visible = false;
+
     this._init();
+  }
+
+  show() {
+    this.visible = true;
+    this.scale = 0;
+
+    const tweenScale = new Tween({
+      scale: 1,
+    }, 0.25,
+    {
+      playOnAdded: true,
+      removeOnComplete: true,
+      ease: Ease.sinusoidalOut,
+    });
+
+    this.addComponent(tweenScale);
+  }
+
+  hide() {
+    const tweenScale = new Tween({
+      scale: 0,
+    }, 0.15,
+    {
+      playOnAdded: true,
+      removeOnComplete: true,
+      ease: Ease.sinusoidalOut,
+    });
+
+    this.addComponent(tweenScale);
+    tweenScale.on('complete', () => {
+      this.visible = false;
+    })
   }
 
   increaseValue() {
