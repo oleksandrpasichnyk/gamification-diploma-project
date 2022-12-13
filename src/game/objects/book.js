@@ -38,6 +38,8 @@ export default class Book extends THREE.Group {
     book.position.x = boundingBox.x * 0.55;
 
     Utils.setObjectMaterial(book, new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide }));
+
+    Utils.setCastShadows(book, true);
   }
 
   _initPlate() {

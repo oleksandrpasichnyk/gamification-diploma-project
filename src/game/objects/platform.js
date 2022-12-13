@@ -23,6 +23,8 @@ export default class Platform extends THREE.Group {
     const mesh = new THREE.Mesh(geometry, material);
     this.add(mesh);
 
+    mesh.receiveShadow = true;
+
     mesh.rotation.y = Math.PI;
   }
 }

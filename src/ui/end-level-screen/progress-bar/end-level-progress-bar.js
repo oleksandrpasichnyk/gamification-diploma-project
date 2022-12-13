@@ -1,4 +1,5 @@
 import { Black, Graphics, DisplayObject, Rectangle, TextField } from "black-engine";
+import GLOBAL_CONFIG from "../../../config";
 
 export default class EndLevelProgressBar extends DisplayObject {
   constructor() {
@@ -15,8 +16,8 @@ export default class EndLevelProgressBar extends DisplayObject {
     this._totalWidth = 330;
     this._totalHeight = 40;
     this._isBared = false;
-    this._darkColor = 0x222222;
-    this._barColor = 0x62f241;
+    this._bgColor = 0xcccccc;
+    this._barColor = 0x1fb8ff;
 
     this.touchable = false;
 
@@ -33,25 +34,26 @@ export default class EndLevelProgressBar extends DisplayObject {
   }
 
   init() {
-    this.initBg();
-    this.initBar();
-    this.initPercentText();
-    this.drawBars();
+    this._initBg();
+    this._initBar();
+    this._initPercentText();
+    this._initWinLine();
+    this._drawBars();
   }
 
-  initBg() {
+  _initBg() {
     const bg = this._bg = new Graphics();
     this.add(bg);
   }
 
-  initBar() {
+  _initBar() {
     const bar = this._bar = new Graphics();
     this.add(bar);
 
     bar.visible = false;
   }
 
-  initPercentText() {
+  _initPercentText() {
     const percentText = this._percentText = new TextField('', 'Arial', 0xffffff, 30);
     percentText.weight = '700';
     percentText.dropShadow = true;
@@ -63,12 +65,25 @@ export default class EndLevelProgressBar extends DisplayObject {
     this.add(percentText);
   }
 
-  drawBars() {
+  _initWinLine() {
+    const winLine = new Graphics();
+    winLine.beginPath();
+    winLine.fillStyle(0x1198d6);
+    winLine.roundedRect(0, 0, 8, this._totalHeight * 1.7, 4);
+    winLine.fill();
+
+    winLine.alignPivotOffset();
+    this.add(winLine);
+
+    winLine.x = -this._totalWidth * 0.5 + this._totalWidth * GLOBAL_CONFIG.percentToWin/100;
+  }
+
+  _drawBars() {
     const { _totalWidth: totalWidth, _totalHeight: totalHeight, _bar: bar, _bg: bg, _currentValue: currentValue } = this;
 
     bg.beginPath();
-    bg.fillStyle(this._darkColor);
-    bg.lineStyle(10, 0x2cc708);
+    bg.fillStyle(this._bgColor);
+    bg.lineStyle(10, 0x999999);
     bg.roundedRect(-totalWidth / 2, -totalHeight / 2, totalWidth, totalHeight, totalHeight * 0.5);
     bg.stroke();
     bg.fill();

@@ -55,9 +55,9 @@ export default class TextIconButton extends ButtonAbstract {
   _initView() {
     const bg = this._bg = new Graphics();
     bg.beginPath();
-    bg.fillStyle(0x62f241);
-    bg.lineStyle(4, 0x2cc708);
-    bg.roundedRect(0, 0, 250, 80, 10);
+    bg.fillStyle(0x1fb8ff);
+    bg.lineStyle(4, 0x1198d6);
+    bg.roundedRect(0, 0, 250, 75, 10);
     bg.closePath();
     bg.fill();
     bg.stroke();
@@ -67,8 +67,10 @@ export default class TextIconButton extends ButtonAbstract {
   }
 
   _initText() {
-    const text = this._text = new TextField(this._textString, 'Arial', 0x333333, 40);
+    const text = this._text = new TextField(this._textString, 'Arial', 0xffffff, 40);
     text.alignPivotOffset(0.5);
+    text.strokeColor = 0x1198d6;
+    text.strokeThickness = 10;
     text.weight = '600';
     text.touchable = true;
     text.y = 4;

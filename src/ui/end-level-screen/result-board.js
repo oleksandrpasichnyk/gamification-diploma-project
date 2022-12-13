@@ -1,9 +1,16 @@
 import { DisplayObject, Ease, Graphics, Sprite, TextField, Tween } from "black-engine";
+import GLOBAL_CONFIG from "../../config";
 import GATES_CONFIG from "../../game/data/gates-config";
 import TextIconButton from "../button/text-button";
 // import Localization from "../../core/localization/localization";
 import EndLevelProgressBar from "./progress-bar/end-level-progress-bar";
 import Stars from "./stars/stars";
+
+const green = 0x62f241;
+const darkGreen = 0x2cc708;
+
+const yellow = 0xf2ec41;
+const darkYellow = 0xf2ca16;
 
 export default class ResultBoard extends DisplayObject {
   constructor(totalWidth = 500, totalHeight = 800) {
@@ -21,6 +28,10 @@ export default class ResultBoard extends DisplayObject {
 
     this.visible = false;
     this.touchable = true;
+
+    this._lightColor = green;
+    this._darkColor = darkGreen;
+
     this.init();
   }
 
@@ -28,7 +39,7 @@ export default class ResultBoard extends DisplayObject {
     const { correctCount, mistakesCount, totalCount, mistakes } = data;
 
     const levelProgress = correctCount/totalCount;
-    const isWin = levelProgress > 0.65;
+    const isWin = levelProgress >= GLOBAL_CONFIG.percentToWin/100;
 
     this._setTitleText(isWin);
     this._setSubtitleText(1, isWin);
@@ -37,7 +48,10 @@ export default class ResultBoard extends DisplayObject {
     this._setMistakesText(mistakes);
 
     this._progressBar.visible = true;
+    this._progressBar.reset();
     this._progressBar.setProgress(levelProgress);
+
+    this._updateColors(isWin);
   }
 
   show() {
@@ -46,14 +60,28 @@ export default class ResultBoard extends DisplayObject {
 
     const tweenScale = new Tween({
       scale: 1,
-    }, 0.25,
+    }, 0.3,
     {
       playOnAdded: true,
       removeOnComplete: true,
-      ease: Ease.sinusoidalOut,
+      ease: Ease.backOut,
     });
 
     this.addComponent(tweenScale);
+  }
+
+  hide() {
+    const tweenScale = new Tween({
+      scale: 0,
+    }, 0.2,
+    {
+      playOnAdded: true,
+      removeOnComplete: true,
+      ease: Ease.backIn,
+    });
+
+    this.addComponent(tweenScale);
+    tweenScale.on('complete', () => this.visible = false);
   }
 
   init() {
@@ -71,7 +99,7 @@ export default class ResultBoard extends DisplayObject {
     const bg = this._bg = new Graphics();
     bg.beginPath();
     bg.fillStyle(0xffffff);
-    bg.lineStyle(10, 0x2cc708);
+    bg.lineStyle(10, this._darkColor);
     bg.roundedRect(0, 0, this._totalWidth, this._totalHeight, 20);
     bg.closePath();
     bg.fill();
@@ -85,10 +113,10 @@ export default class ResultBoard extends DisplayObject {
   _initTitle() {
     const title = new DisplayObject();
 
-    const titleBg = new Graphics();
+    const titleBg = this._titleBg = new Graphics();
     titleBg.beginPath();
-    titleBg.fillStyle(0x62f241);
-    titleBg.lineStyle(10, 0x2cc708);
+    titleBg.fillStyle(this._lightColor);
+    titleBg.lineStyle(10, this._darkColor);
     titleBg.roundedRect(0, 0, this._totalWidth * 0.6, 80, 20);
     titleBg.closePath();
     titleBg.fill();
@@ -115,7 +143,7 @@ export default class ResultBoard extends DisplayObject {
   }
 
   _initSubtitleText() {
-    const subtitleText = this._subtitleText = new TextField('', 'Arial', 0x333333, 45);
+    const subtitleText = this._subtitleText = new TextField('', 'Arial', 0x333333, 40);
     subtitleText.weight = '500';
     subtitleText.alignAnchor();
     this.add(subtitleText);
@@ -130,13 +158,13 @@ export default class ResultBoard extends DisplayObject {
     // Localization.fitText(subtitleText, this.totalWidth * 0.8, 100);
     subtitleText.alignAnchor(0.5);
 
-    subtitleText.y = -this._totalHeight * 0.5 + (isWin ? 130 : 100);
+    // subtitleText.y = -this._totalHeight * 0.5 + (isWin ? 130 : 100);
   }
 
   _initProgressBar() {
     const progressBar = this._progressBar = new EndLevelProgressBar();
     this.add(progressBar);
-    progressBar.y = -this._totalHeight * 0.5 + 210;
+    progressBar.y = -this._totalHeight * 0.5 + 170;
     progressBar.visible = false;
   }
 
@@ -242,11 +270,27 @@ export default class ResultBoard extends DisplayObject {
 
     button.y = this._totalHeight * 0.5 - 100;
     button.on('onClick', () => {
-      console.log('onClick');
+      this.hide();
     });
   }
 
   _setStartsCount(count) {
     this._stars.setCount(count);
+  }
+
+  _updateColors(isWin) {
+    const titleBg = this._titleBg;
+    const bg = this._bg;
+
+    this._lightColor = isWin ? green : yellow;
+    this._darkColor = isWin ? darkGreen : darkYellow;
+
+    bg.lineStyle(10, this._darkColor);
+    bg.stroke();
+
+    titleBg.fillStyle(this._lightColor);
+    titleBg.lineStyle(10, this._darkColor);
+    titleBg.fill();
+    titleBg.stroke();
   }
 }

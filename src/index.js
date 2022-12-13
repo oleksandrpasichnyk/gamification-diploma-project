@@ -23,7 +23,7 @@ loader.events.on('onLoaded', () => {
 
 
 
-showFPSMeter();
+// showFPSMeter();
 
 function showFPSMeter() {
   (function () {

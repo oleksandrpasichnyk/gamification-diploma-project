@@ -89,7 +89,7 @@ export default class Game {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = 0.95;
-    
+
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.top = 0;
     renderer.domElement.style.touchAction = 'none';
@@ -111,41 +111,32 @@ export default class Game {
     } = GLOBAL_CONFIG;
     
     if (directionalLightEnabled) {
-      const directionalLight = new THREE.DirectionalLight(directionalLightColor, 0.1);
+      const directionalLight = this._directionalLight = new THREE.DirectionalLight(directionalLightColor, directionalLightIntensity);
       directionalLight.lookAt(directionalLightLookAt.x, directionalLightLookAt.y, directionalLightLookAt.z);
       directionalLight.position.set(directionalLightPosition.x, directionalLightPosition.y, directionalLightPosition.z);
       this._scene.add(directionalLight);
 
       directionalLight.castShadow = true;
       // directionalLight.shadow.bias = -0.01
-      directionalLight.shadow.mapSize.width = 1300;
-      directionalLight.shadow.mapSize.height = 1300;
-    
-      const shadowCamera = directionalLight.shadow.camera;
-      shadowCamera.left = -7 * 0.4;
-      shadowCamera.right = 7 * 0.4;
-      shadowCamera.bottom = -7 * 0.5;
-      shadowCamera.top = 7 * 0.5;
-      shadowCamera.far = 40;
-    }
-    
-    const directionalLight = new THREE.DirectionalLight(directionalLightColor, 0.75);
-    directionalLight.lookAt(directionalLightLookAt.x, directionalLightLookAt.y, directionalLightLookAt.z);
-    directionalLight.position.set(directionalLightPosition.x, directionalLightPosition.y, directionalLightPosition.z);
-    this._scene.add(directionalLight);
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
 
-    directionalLight.castShadow = false;
-    // directionalLight.shadow.bias = -0.01
-    directionalLight.shadow.mapSize.width = 1300;
-    directionalLight.shadow.mapSize.height = 1300;
-    
-    const shadowCamera = directionalLight.shadow.camera;
-    shadowCamera.left = -7 * 0.4;
-    shadowCamera.right = 7 * 0.4;
-    shadowCamera.bottom = -7 * 0.5;
-    shadowCamera.top = 7 * 0.5;
-    shadowCamera.far = 40;
-    
+      const shadowCamera = directionalLight.shadow.camera;
+      const d = 20;
+
+      shadowCamera.left = -d * 0.5;
+      shadowCamera.right = d * 0.5;
+      shadowCamera.bottom = -d * 0.5;
+      shadowCamera.top = d * 0.5;
+      shadowCamera.near = 0.1;  
+      shadowCamera.far = new THREE.Vector3(directionalLightPosition.x, directionalLightPosition.y, directionalLightPosition.z).length() * 1.3;  
+
+      const cameraHelper = this._cameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+      this._scene.add(cameraHelper);
+  
+      const helper = new THREE.DirectionalLightHelper(directionalLight, 100, 0xff0000);
+      this._scene.add(helper);
+    }
     
     if (ambientLightEnabled) {
       const ambientlight = new THREE.AmbientLight(ambientLightColor, ambientLightIntensity);
@@ -169,7 +160,7 @@ export default class Game {
   }
 
   _initWorld() {
-    const world = this._world = new World(this._camera, this._scene);
+    const world = this._world = new World(this._camera, this._scene, this._directionalLight);
     this._scene.add(world);
 
     const ui = this._ui = new UI();
@@ -191,6 +182,8 @@ export default class Game {
       if(GLOBAL_CONFIG.orbitControls) {
         this._orbitControls.update();
       }
+      
+      this._cameraHelper.update();
     }
     
     window.requestAnimationFrame(() => this.update());
